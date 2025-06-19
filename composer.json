@@ -1,0 +1,25 @@
+{
+    "name": "storesgit/storegit",
+    "description": "E-commerce project",
+    "type": "project",
+    "require": {
+        "php": ">=7.4"
+    },
+    "config": {
+        "platform": {
+            "php": "7.4"
+        }
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "if [ -f /usr/bin/npm ]; then npm install; fi",
+            "if [ -f /usr/bin/npm ]; then cd frontend && npm install && npm run build; fi",
+            "if [ -f /usr/bin/npm ]; then cd ../backend && npm install; fi"
+        ],
+        "post-update-cmd": [
+            "if [ -f /usr/bin/npm ]; then npm install; fi",
+            "if [ -f /usr/bin/npm ]; then cd frontend && npm install && npm run build; fi",
+            "if [ -f /usr/bin/npm ]; then cd ../backend && npm install; fi"
+        ]
+    }
+} 

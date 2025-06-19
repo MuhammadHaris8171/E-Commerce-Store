@@ -1,0 +1,25 @@
+{
+  "name": "ecommerce-project",
+  "version": "1.0.0",
+  "description": "E-commerce project deployment configuration",
+  "scripts": {
+    "build": "cd frontend && npm install && npm run build && cd ../backend && npm install",
+    "start": "cd backend && node server.js"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "deploy": {
+    "frontend": {
+      "build": "frontend/build",
+      "static": true
+    },
+    "backend": {
+      "build": "backend",
+      "start": "node server.js",
+      "env": {
+        "NODE_ENV": "production"
+      }
+    }
+  }
+} 
