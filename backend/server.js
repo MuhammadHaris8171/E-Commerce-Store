@@ -29,7 +29,7 @@ const app = express();
 app.use(helmet());
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
-    ? 'https://your-production-domain.com' 
+    ? 'https://digital-ocean-olive.vercel.app' 
     : 'http://localhost:3000',
   credentials: true
 }));
