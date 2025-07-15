@@ -10,6 +10,9 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { login, user, loading } = useAuth();
+useEffect(() => {
+  alert('Email: admin@gmail.com\nPassword: 243Gc794');
+}, []);
 
   // Redirect if already logged in (for page refresh scenarios)
   useEffect(() => {
