@@ -8,6 +8,7 @@ const ItemCategory = require('./models/ItemCategory');
 const Brand = require('./models/Brand');
 const Currency = require('./models/Currency');
 const Branch = require('./models/Branch');
+const bcrypt = require('bcryptjs');
 
 dotenv.config();
 
@@ -41,7 +42,7 @@ const seedDatabase = async () => {
     // Create admin user
     const adminUser = await User.create({
       username: 'admin',
-      email: 'admin@example.com',
+      email: 'admin@gmail.com',
       password: 'admin123', // Note: In production, this should be hashed
       role: roles[0]._id,
       isActive: true
@@ -114,4 +115,29 @@ const seedDatabase = async () => {
   }
 };
 
-seedDatabase(); 
+async function ensureAdminUser() {
+  await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/ecommerce', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
+
+  const admin = await User.findOne({ email: 'admin@gmail.com' });
+  if (!admin) {
+    const hashedPassword = await bcrypt.hash('admin123', 10);
+    await User.create({
+      username: 'admin',
+      email: 'admin@gmail.com',
+      password: hashedPassword,
+      role: 'admin',
+      name: 'Admin',
+      loginPin: '0000'
+    });
+    console.log('Default admin user created');
+  } else {
+    console.log('Admin user already exists');
+  }
+  mongoose.disconnect();
+}
+
+seedDatabase();
+ensureAdminUser(); 

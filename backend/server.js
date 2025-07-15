@@ -22,6 +22,10 @@ const BrandRoutes = require('./routes/brandRoute');
 const CurrencyRoutes = require('./routes/currencyRoute');
 const MenuItemRoutes = require('./routes/MenuItem');
 const TaxRoutes = require('./routes/tax');
+const SupplierRoutes = require('./routes/supplierRoutes');
+const PackageItemRoutes = require('./routes/packageItemRoutes');
+const packagingRoutes = require('./routes/packagingRoutes');
+const SubCategoryRoutes = require('./routes/subCategoryRoutes');
 
 const app = express();
 
@@ -29,31 +33,42 @@ const app = express();
 app.use(helmet());
 const allowedOrigins = [
   'http://localhost:3000',
-  'http://127.0.0.1:3000',
-  'https://digital-ocean-olive.vercel.app',
-  'https://your-other-domain.com'
+  'https://gnrcontrol.com',
+  'https://www.gnrcontrol.com',
+  'https://digital-ocean-olive.vercel.app'
 ];
 
 app.use(cors({
-  origin: (origin, callback) => {
-    // Allow requests with no origin (e.g., mobile apps, curl)
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl)
     if (!origin) return callback(null, true);
-
     if (allowedOrigins.includes(origin)) {
       return callback(null, true);
     } else {
       return callback(new Error('Not allowed by CORS'));
     }
   },
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 
-// Rate limiting
+
+// General rate limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100 // limit each IP to 100 requests per windowMs
 });
-// app.use(limiter);
+app.use(limiter);
+
+// Specific rate limiting for login attempts
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // limit each IP to 5 login attempts per windowMs
+  message: { message: 'Too many login attempts, please try again later.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 app.use(express.json());
 
@@ -85,6 +100,7 @@ app.use('/api/roles', roleRoutes);
 app.use('/api/departments', departmentRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/gallery', galleryRoutes);
+app.use('/api/packaging', packagingRoutes);
 app.use('/api/units', unitRoutes);
 app.use('/api/item-categories', ItemCategoryRoutes);
 app.use('/api/items', ItemRoutes); 
@@ -94,6 +110,12 @@ app.use('/api/brand', BrandRoutes);
 app.use('/api/currency', CurrencyRoutes);
 app.use('/api/menu', MenuItemRoutes) 
 app.use('/api/tax', TaxRoutes) 
+app.use('/api/suppliers', SupplierRoutes);
+app.use('/api/package-items', PackageItemRoutes);
+app.use('/api/sub-categories', SubCategoryRoutes);
+
+// Apply login rate limiting to login route
+app.use('/api/users/login', loginLimiter);
 
 // Start server
 const PORT = process.env.PORT || 5050;

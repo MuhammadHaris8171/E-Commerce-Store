@@ -2,10 +2,9 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
-  username: {
+  name: {
     type: String,
     required: true,
-    unique: true,
     trim: true
   },
   email: {
@@ -22,7 +21,7 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['admin', 'user'],
+    enum: ['master_admin', 'admin', 'user'],
     default: 'user'
   },
   profilePicture: {
@@ -33,11 +32,13 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: true
   },
-  name: { type: String, required: true },
-  branch: { type: mongoose.Schema.Types.ObjectId, ref: 'Branch'},
-  // departments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'departments' }],
-  loginPin: { type: String, required: true },
-  biometricId: { type: String }
+  biometricId: { type: String },
+  permissions: {
+    canCreate: { type: Boolean, default: false },
+    canEdit: { type: Boolean, default: false },
+    canDelete: { type: Boolean, default: false },
+    canView: { type: Boolean, default: true }
+  }
 }, {
   timestamps: true
 });
@@ -59,6 +60,52 @@ userSchema.pre('save', async function(next) {
 userSchema.methods.comparePassword = async function(candidatePassword) {
   return bcrypt.compare(candidatePassword, this.password);
 };
+
+// Method to check if user is master admin
+userSchema.methods.isMasterAdmin = function() {
+  return this.role === 'master_admin';
+};
+
+// Method to check if user has permission
+userSchema.methods.hasPermission = function(action) {
+  if (this.isMasterAdmin()) {
+    return true; // Master admin has all permissions
+  }
+  return this.permissions[action] || false;
+};
+
+// Set default permissions based on role
+userSchema.pre('save', function(next) {
+  if (this.isModified('role')) {
+    switch (this.role) {
+      case 'master_admin':
+        this.permissions = {
+          canCreate: true,
+          canEdit: true,
+          canDelete: true,
+          canView: true
+        };
+        break;
+      case 'admin':
+        this.permissions = {
+          canCreate: true,
+          canEdit: true,
+          canDelete: false,
+          canView: true
+        };
+        break;
+      case 'user':
+        this.permissions = {
+          canCreate: false,
+          canEdit: false,
+          canDelete: false,
+          canView: true
+        };
+        break;
+    }
+  }
+  next();
+});
 
 const User = mongoose.model('User', userSchema);
 

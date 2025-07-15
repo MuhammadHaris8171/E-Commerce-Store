@@ -1,7 +1,8 @@
 import axios from 'axios';
+import backend_url from '../config/config';
 
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL,
+  baseURL: backend_url,
   headers: {
     'Content-Type': 'application/json'
   }
@@ -21,8 +22,14 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
+      // Check if it's a token expiration error
+      if (error.response?.data?.code === 'TOKEN_EXPIRED') {
+        console.log('Token expired, redirecting to login...');
+      }
+      
+      // Clear token and redirect to login for any 401 error
       localStorage.removeItem('token');
-      window.location.href = '/login';
+      window.location.href = '/';
     }
     return Promise.reject(error);
   }

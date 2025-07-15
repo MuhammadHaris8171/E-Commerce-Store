@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import logo from "../assets/desktop-logo.png";
 import logo1 from "../assets/toggle-logo.png";
 
@@ -135,31 +136,51 @@ const Sidebar = ({ menuItems, isCollapsed }) => {
 };
 
 // Header Component
-const Header = ({ onMenuToggle, isSidebarCollapsed }) => (
-    <div className="bg-white shadow-md flex items-center justify-between h-16 px-4 sticky top-0 z-9">
-        <div className="flex items-center">
-            <button
-                className="text-gray-500 focus:outline-none mr-4"
-                onClick={onMenuToggle}
-            >
-                <svg
-                    className="h-6 w-6"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
+const Header = ({ onMenuToggle, isSidebarCollapsed }) => {
+    const { user, logout, isMasterAdmin } = useAuth();
+    
+    const handleLogout = async () => {
+        await logout();
+    };
+    
+    return (
+        <div className="bg-white shadow-md flex items-center justify-between h-16 px-4 sticky top-0 z-9">
+            <div className="flex items-center">
+                <button
+                    className="text-gray-500 focus:outline-none mr-4"
+                    onClick={onMenuToggle}
                 >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-            </button>
-            <div className="text-sm text-gray-600">
-                <span>Dashboard</span>
+                    <svg
+                        className="h-6 w-6"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                    >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+                <div className="text-sm text-gray-600">
+                    <span>Dashboard</span>
+                </div>
+            </div>
+            <div className="flex items-center gap-4">
+                <div className="text-right">
+                    <div className="text-sm font-medium text-gray-700">{user?.name || 'User'}</div>
+                    <div className="text-xs text-gray-500 flex items-center gap-1">
+                        <span className="capitalize">{user?.role || 'user'}</span>
+                        {isMasterAdmin() && <span className="text-blue-600">👑</span>}
+                    </div>
+                </div>
+                <button
+                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition-colors"
+                    onClick={handleLogout}
+                >
+                    Logout
+                </button>
             </div>
         </div>
-        <div className="flex items-center">
-            <span className="text-gray-700">Admin</span>
-        </div>
-    </div>
-);
+    );
+};
 
 // Layout Component
 function Layout({ children, menuItems }) {

@@ -119,7 +119,7 @@ const MenuItems = () => {
             <tr key={item._id}>
               <td className="py-2 border-b text-center">{i + 1}</td>
               <td className="py-2 border-b text-center">{item.name}</td>
-              <td className="py-2 border-b text-center">{item.brand.nameEn}</td>
+              <td className="py-2 border-b text-center">{item.brand?.nameEn || 'N/A'}</td>
               <td className="py-2 border-b text-center space-x-2">
                 <button onClick={() => openEditModal(item)} className="text-purple-600 hover:underline">Edit</button>
                 <button onClick={() => handleDelete(item._id)} className="text-red-500 hover:underline">Delete</button>
