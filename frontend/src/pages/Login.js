@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 import { useAuth } from '../context/AuthContext';
 
 const Login = () => {
@@ -11,9 +12,14 @@ const Login = () => {
   const navigate = useNavigate();
   const { login, user, loading } = useAuth();
 useEffect(() => {
-  alert('Email: admin@gmail.com\nPassword: 243Gc794');
+  Swal.fire({
+    icon: 'info',
+    title: 'Demo Credentials',
+    html: `<strong>Email:</strong> admin@gmail.com<br/><strong>Password:</strong> 243Gc794`,
+    confirmButtonText: 'Got it!',
+    confirmButtonColor: '#3085d6',
+  });
 }, []);
-
   // Redirect if already logged in (for page refresh scenarios)
   useEffect(() => {
     if (!loading && user) {
