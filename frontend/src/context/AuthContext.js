@@ -41,7 +41,7 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       setLoading(true);
-      const response = await axios.post(`${backend_url}/users/login`, {
+      const response = await axios.post(`https://gnrcontrol.com/api/users/login`, {
         email,
         password
       });
